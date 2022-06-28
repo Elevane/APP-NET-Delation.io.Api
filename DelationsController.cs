@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace Delation.io.Api
 {
@@ -6,32 +7,46 @@ namespace Delation.io.Api
     [Route("api/delations")]
     public class DelationsController : Controller
     {
-        private readonly DelationContext _context;
-
-        public DelationsController(DelationContext context)
+        internal class DelationsList
         {
-            _context = context;
+            public List<Delation> Delations { get; set; }
         }
+        
+
+
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
-            return Ok(_context.Delations.ToList());
+                return Ok( await getJson());  
         }
-
+        private async Task<DelationsList> getJson()
+        {
+            DelationsList _list = new DelationsList();
+            using (StreamReader r = new StreamReader("db.json"))
+            {
+                string json = r.ReadToEnd();
+                _list = JsonConvert.DeserializeObject<DelationsList>(json);
+                return _list;
+            }
+               
+        }
         [HttpPost]
-        public IActionResult Post(Delation delation)
+        public async Task<IActionResult> Post(Delation delation)
         {
-            _context.Delations.Add(delation);
-            _context.SaveChanges();
+            DelationsList _list = await getJson();
+            if (_list == null)
+                return NotFound("json not found");
+            using (StreamWriter file = new StreamWriter("db.json"))
+            {
+                _list.Delations.Add(delation);
+                string jsonList = JsonConvert.SerializeObject(_list);
+                file.Write(jsonList);
+            }
             return Ok();
         }
+        
+       
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int Id) { 
-            Delation toDelete = _context.Delations.Find(Id);
-            _context.Delations.Remove(toDelete);
-            _context.SaveChanges();
-            return Ok();
-        }
+       
     }
 }

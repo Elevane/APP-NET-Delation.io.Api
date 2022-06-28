@@ -1,8 +1,8 @@
 ﻿namespace Delation.io.Api;
 public class Delation
 {
-    public int Id { get; set; }
-    public string action { get; set; }
+    public string Id { get; set; }
+    public string actionname { get; set; }
     public string name { get; set; }
-    public DateTime date { get; set; }
+    public DateTime? date_delation { get; set; }
 }

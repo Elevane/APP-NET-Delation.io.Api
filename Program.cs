@@ -20,7 +20,6 @@ builder.Services.AddCors(options =>
                           policy.AllowAnyOrigin();
                       });
 });
-builder.Services.AddScoped<DelationContext>( context => new DelationContext(builder.Configuration.GetSection("DefaultConnection").Value));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
